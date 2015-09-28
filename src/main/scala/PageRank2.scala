@@ -36,7 +36,7 @@ object PageRank2 {
 
     // Print the result
     //println(ranksByUrl.collect().mkString("\n"))
-    ranksByUrl.saveAsTextFile(Config.home + "scala-output")
+    ranksByUrl.saveAsTextFile(Config.home + "scala-output-" + DateUtils.format())
   }
 
 }
