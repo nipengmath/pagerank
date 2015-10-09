@@ -3,6 +3,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import org.apache.spark.Logging
+import org.apache.spark.storage.StorageLevel
 
 object PageRank extends Serializable with Logging {
 
@@ -25,6 +26,7 @@ object PageRank extends Serializable with Logging {
       // VM Arguments: -Dmaster=local
       sparkConf.setMaster(master)
     }
+    sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     
     val sc = new SparkContext(sparkConf)
     if (master != null && master.equals("local")) {
@@ -35,7 +37,7 @@ object PageRank extends Serializable with Logging {
     var endTime = System.nanoTime()    
     logInfo("Spark context loaded: " + ((endTime - startTime) / 1000000000d))
     
-    val graph = GraphLoader.edgeListFile(sc, graphFile)
+    val graph = GraphLoader.edgeListFile(sc, graphFile, false, 20, StorageLevel.MEMORY_AND_DISK_SER, StorageLevel.MEMORY_AND_DISK_SER)
     endTime = System.nanoTime()    
     logInfo("Graph loaded: " + ((endTime - startTime) / 1000000000d))
 
