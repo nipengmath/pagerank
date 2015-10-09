@@ -37,7 +37,7 @@ object PageRank extends Serializable with Logging {
     var endTime = System.nanoTime()    
     logInfo("Spark context loaded: " + ((endTime - startTime) / 1000000000d))
     
-    val graph = GraphLoader.edgeListFile(sc, graphFile, false, 20, StorageLevel.MEMORY_AND_DISK_SER, StorageLevel.MEMORY_AND_DISK_SER)
+    val graph = GraphLoader.edgeListFile(sc, graphFile, false, sc.defaultParallelism, StorageLevel.MEMORY_AND_DISK, StorageLevel.MEMORY_AND_DISK)
     endTime = System.nanoTime()    
     logInfo("Graph loaded: " + ((endTime - startTime) / 1000000000d))
 
