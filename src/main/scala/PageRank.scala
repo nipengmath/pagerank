@@ -40,7 +40,7 @@ object PageRank extends Serializable with Logging {
     val graph = GraphLoader.edgeListFile(sc, graphFile, false, sc.defaultParallelism, StorageLevel.MEMORY_AND_DISK, StorageLevel.MEMORY_AND_DISK)
     endTime = System.nanoTime()    
     logInfo("Graph loaded: " + ((endTime - startTime) / 1000000000d))
-
+/*
     val ranks = graph.pageRank(0.0001).vertices
     endTime = System.nanoTime()    
     logInfo("Page rank executed: " + ((endTime - startTime) / 1000000000d))
@@ -67,6 +67,8 @@ object PageRank extends Serializable with Logging {
     orderedRanks.saveAsTextFile(Config.home + "scala-output-" + DateUtils.format())
     endTime = System.nanoTime()    
     logInfo("Saved to text file: " + ((endTime - startTime) / 1000000000d))
+    * 
+    */
   }
 
 }
