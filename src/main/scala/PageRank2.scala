@@ -77,6 +77,7 @@ object PageRank2 {
     // Print PageRank result
     //println(ranks.collect.toSeq.sortBy(_._2).mkString("\n"))
     println("Outputting the ranked vertices (gzipped)")
-    ranks.saveAsTextFile("/tmp/rankOutGzip/", classOf[GzipCodec])
+    //ranks.saveAsTextFile("/tmp/rankOutGzip/", classOf[GzipCodec])
+    ranks.saveAsTextFile("/tmp/scala-output-" + DateUtils.format())
   }
 }

@@ -10,12 +10,11 @@ object PageRank extends Serializable with Logging {
   def main(args: Array[String]): Unit = {
     logInfo("args: " + args.mkString(" "))
 
-    val msg = "Usage: PageRank <graphFile> <resultFile>" 
-    require(args.length == 2, msg)  
+    val msg = "Usage: PageRank <graphFile>" 
+    require(args.length == 1, msg)  
     
     val graphFile = args(0)
 //    val indexFile = args(1)
-    val resultFile = args(1)
     
     val startTime = System.nanoTime()
 
@@ -48,7 +47,7 @@ object PageRank extends Serializable with Logging {
     
     // Save the results in text file
     //println(ranksByUrl.collect().mkString("\n"))
-    ranks.saveAsTextFile(resultFile)
+    ranks.saveAsTextFile("/tmp/scala-output-" + DateUtils.format())
     endTime = System.nanoTime()    
     logInfo("Saved to text file: " + ((endTime - startTime) / 1000000000d))
     
