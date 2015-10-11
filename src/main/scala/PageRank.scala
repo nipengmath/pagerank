@@ -10,11 +10,12 @@ object PageRank extends Serializable with Logging {
   def main(args: Array[String]): Unit = {
     logInfo("args: " + args.mkString(" "))
 
-    val msg = "Usage: PageRank <graphFile> <indexFile>" 
+    val msg = "Usage: PageRank <graphFile> <resultFile>" 
     require(args.length == 2, msg)  
     
     val graphFile = args(0)
-    val indexFile = args(1)
+//    val indexFile = args(1)
+    val resultFile = args(1)
     
     val startTime = System.nanoTime()
 
@@ -40,6 +41,17 @@ object PageRank extends Serializable with Logging {
     val graph = GraphLoader.edgeListFile(sc, graphFile, false, sc.defaultParallelism, StorageLevel.MEMORY_AND_DISK, StorageLevel.MEMORY_AND_DISK)
     endTime = System.nanoTime()    
     logInfo("Graph loaded: " + ((endTime - startTime) / 1000000000d))
+
+    val ranks = graph.pageRank(0.0001).vertices
+    endTime = System.nanoTime()    
+    logInfo("Page rank executed: " + ((endTime - startTime) / 1000000000d))
+    
+    // Save the results in text file
+    //println(ranksByUrl.collect().mkString("\n"))
+    ranks.saveAsTextFile(resultFile)
+    endTime = System.nanoTime()    
+    logInfo("Saved to text file: " + ((endTime - startTime) / 1000000000d))
+    
 /*
     val ranks = graph.pageRank(0.0001).vertices
     endTime = System.nanoTime()    
