@@ -1,23 +1,24 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
-
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
-
 import org.apache.spark.graphx.Edge
 import org.apache.spark.graphx.EdgeRDD
 import org.apache.spark.graphx.Graph
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.graphx.PartitionStrategy
 import org.apache.spark.graphx.VertexRDD
-
 import org.apache.hadoop.io.compress.GzipCodec
+import org.apache.spark.Logging
 
-object PageRank2 {
+object PageRank2 extends Serializable with Logging {
   def main(args: Array[String]) {
-
+    logInfo("args: " + args.mkString(" "))
+    val src = args(0)
+    val parts = args(1).toInt
+    
     val conf = new SparkConf().setAppName("PageRank2")
     val master = System.getProperty("master")
     if (master != null) {
@@ -34,7 +35,7 @@ object PageRank2 {
     conf.set("spark.storage.memoryFraction", "0.4")
     conf.set("spark.shuffle.memoryFraction", "0.1")
     //
-    conf.set("spark.eventLog.enabled", "true")
+    //conf.set("spark.eventLog.enabled", "true")
     // Help prevent FetchFailed exceptions when single node is heavily taxed
     // http://stackoverflow.com/questions/26247654/spark-fail-to-run-the-terasort-when-the-amount-of-data-gets-bigger
     conf.set("spark.core.connection.ack.wait.timeout", "180")
@@ -46,10 +47,6 @@ object PageRank2 {
       sc.hadoopConfiguration.set("fs.defaultFS", "file:///")
     }
 
-    println("Data:")
-    println(args(0))
-    val src = args(0)
-    val parts = args(1).toInt
     val cacheType = StorageLevel.MEMORY_AND_DISK_SER
 
     // Only repartition if it's local as otherwise there's large amounts of network communication
@@ -64,19 +61,17 @@ object PageRank2 {
     }.map(e => Edge(e._1, e._2, 0)) //.persist(StorageLevel.DISK_ONLY)
     val edgeRDD = EdgeRDD.fromEdges(edgeList)
 
-    println("Constructing graph...")
+    logInfo("Constructing graph...")
     val graph = Graph.fromEdges(edgeRDD, defaultValue = 0, cacheType, cacheType).partitionBy(PartitionStrategy.RandomVertexCut, parts)
     //edgeList.unpersist()
-    println("Vertices:")
-    println(graph.vertices.count)
-    println("Edges:")
-    println(graph.edges.count)
+    logInfo("Vertices: " + graph.vertices.count)
+    logInfo("Edges: " + graph.edges.count)
 
     // Run PageRank
     val ranks = graph.staticPageRank(numIter = 30).vertices
     // Print PageRank result
     //println(ranks.collect.toSeq.sortBy(_._2).mkString("\n"))
-    println("Outputting the ranked vertices (gzipped)")
+    logInfo("Outputting the ranked vertices (gzipped)")
     //ranks.saveAsTextFile("/tmp/rankOutGzip/", classOf[GzipCodec])
     ranks.saveAsTextFile("/tmp/scala-output-" + DateUtils.format())
   }
